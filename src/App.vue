@@ -86,7 +86,7 @@
 </template>
 
 <script>
-//import * as NanoCurrency from 'nanocurrency'
+import * as NanoCurrency from 'nanocurrency'
 import GoogleLogin from 'vue-google-login'
 import draggable from 'vuedraggable'
 import YAML from 'yaml'
@@ -173,6 +173,14 @@ export default {
       this.customrequired = false
     },
     async sendForm () {
+      if (! this.productname || ! this.productid || ! this.price || ! NanoCurrency.checkAddress(this.destination) || this.form.length == 0) {
+        this.$notify({
+          title: 'Error',
+          text: 'Input Required',
+          type: 'error'
+        })
+        return false
+      }
       let formobj = {}
       formobj['product'] = this.productname
       formobj['productid'] = this.productid
