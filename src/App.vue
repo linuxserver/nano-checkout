@@ -6,21 +6,23 @@
   </div>
   <GoogleLogin v-show="logged !== true" :params="gparams" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
   <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true style="position:absolute; top:0; right:0;" >Sign Out</GoogleLogin>
-  <div style="width: 30%; float: left;">
-  <h3>Available Elements</h3>
-  <draggable class="list-group" group="people" :list="available" @change="log"><button @click="addCustom">Add Custom</button>
-    <div class="list-group-item" v-for="(element) in available" :key="element.name">
-      {{ element.name }}
+  <div v-show="logged === true" id="generatecheckout">
+    <div style="width: 30%; float: left;">
+      <h3>Available Elements</h3>
+      <draggable class="list-group" group="people" :list="available" @change="log"><button @click="addCustom">Add Custom</button>
+        <div class="list-group-item" v-for="(element) in available" :key="element.name">
+          {{ element.name }}
+        </div>
+      </draggable>
     </div>
-  </draggable>
-  </div>
-  <div style="width: 70%; float: right;">
-  <h3>Form</h3>
-  <draggable class="list-group" group="people" :list="form" @change="log">
-    <div class="list-group-item" v-for="(element) in form" :key="element.name">
-      {{ element.name }}
+    <div style="width: 70%; float: right;">
+      <h3>Form</h3>
+      <draggable class="list-group" group="people" :list="form" @change="log">
+        <div class="list-group-item" v-for="(element) in form" :key="element.name">
+          {{ element.name }}
+        </div>
+      </draggable>
     </div>
-  </draggable>
   </div>
 </div>
 </template>
