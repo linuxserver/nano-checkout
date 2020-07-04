@@ -9,8 +9,8 @@
   <GoogleLogin v-show="logged !== true" :params="gparams" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
   <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true style="position:absolute; top:0; right:0;" >Sign Out</GoogleLogin>
   <div v-show="logged === true" id="generatecheckout">
-    <div style="width: 30%; float: left;">
-      <h3>Transaction Values</h3>
+    <div style="width: 20%; float: left;">
+      <h3>Transaction Values (Required)</h3>
       <label for="productname">Product Name:</label>
       <input type="text" v-model="productname" id="productname" name="productname" class="corevalues" Placeholder="My Product"><br>
       <label for="productid">Product ID:</label>
@@ -24,10 +24,12 @@
         <option>live</option>
         <option>lsio</option>
       </select>
-      <h3>Available</h3>
-      <draggable :list="available" group="formelements">
+      <h3>Available (*min one custom or preset)</h3>
+      <draggable :list="available" group="formelements" style="min-height: 150px;">
         <div v-for="(element) in available" :key="element.name" >
-          {{ element.name }}
+          <div class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
+            {{ element.name }}
+          </div>
         </div>
       </draggable>
       <h3>Custom Elements <button @click="addCustom">Add Custom</button><button @click="resetCustom">Reset</button></h3>
@@ -39,26 +41,28 @@
       <input type="text" v-model="customplaceholder" id="customplaceholder" name="customplaceholder"><br>
       <label for="customrequired"> Required</label>
       <input type="checkbox" v-model="customrequired" id="customrequired" name="customrequired"><br>
-      <draggable :list="custom" group="formelements">
+      <draggable :list="custom" group="formelements" style="min-height: 150px;">
         <div v-for="(element) in custom" :key="element.name">
-          {{ element.items }}
+          <div class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue"> 
+            {{ element.items }}
+          </div>
         </div>
       </draggable>
     </div>
     <div style="width: 70%; float: right;">
       <h3>Form</h3>
       <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }} ,please save your receipt from this order it will help you verify your order if something goes wrong</h4>
-      <draggable :list="form" group="formelements">
+      <draggable :list="form" group="formelements" style="min-height: 300px;">
         <div v-for="(element) in form" :key="element.name">
-          <div v-if="element.name === 'email'">
+          <div v-if="element.name === 'email'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <label for="email">Email:</label>
             <input type="text" id="email" name="email" class="checkout" Placeholder="user@email.com">
           </div>
-          <div v-if="element.name === 'name'">
+          <div v-if="element.name === 'name'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" class="checkout" Placeholder="First and Last Name">
           </div>
-          <div v-if="element.name === 'address'">
+          <div v-if="element.name === 'address'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <label for="address1">Address:</label>
             <input type="text" id="address1" name="address1" class="checkout" placeholder="Street Address">
             <label for="address2">Address 2:</label>
@@ -72,7 +76,7 @@
             <label for="zip">Postal Code:</label>
             <input type="text" id="zip" name="zip" class="checkout" placeholder="Local Postal Code">
           </div>
-          <div v-if="element.name === 'custom'">
+          <div v-if="element.name === 'custom'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <div v-for="(item) in element.items" :key="item.customname">
               <label :for="item.customname">{{ item.customformlabel }}:</label>
               <input type="text" :id="item.customname" :name="item.customname" class="customcheckout" :placeholder="item.customplaceholder" :required="item.customrequired"><br>
@@ -266,5 +270,24 @@ html, body {
 }
 .fa-spinner {
   animation: spinner 1s linear infinite;
+}
+.boxshadow 
+{
+  padding: 10px;
+  -moz-box-shadow: 3px 3px 5px #535353;
+  -webkit-box-shadow: 3px 3px 5px #535353;       
+  box-shadow: 3px 3px 5px #535353;
+}
+.roundbox
+{  
+  -moz-border-radius: 6px 6px 6px 6px;
+  -webkit-border-radius: 6px;  
+  border-radius: 6px 6px 6px 6px;
+}
+label {
+  padding: 8px;
+  display: inline-block;
+  width:120px;
+  text-align: left;
 }
 </style>
