@@ -32,7 +32,7 @@
           </div>
         </div>
       </draggable>
-      <h3>Custom Elements <button @click="addCustom">Add Custom</button><button @click="resetCustom">Reset</button></h3>
+      <h3>Custom Elements <button @click="addCustom">Add Custom</button></h3>
       <label for="customname">Name:</label>
       <input type="text" v-model="customname" id="customname" name="customname"><br>
       <label for="customformlabel">Form Label:</label>
@@ -41,13 +41,6 @@
       <input type="text" v-model="customplaceholder" id="customplaceholder" name="customplaceholder"><br>
       <label for="customrequired"> Required</label>
       <input type="checkbox" v-model="customrequired" id="customrequired" name="customrequired"><br>
-      <draggable :list="custom" group="formelements" style="min-height: 150px;">
-        <div v-for="(element) in custom" :key="element.name">
-          <div class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue"> 
-            {{ element.items }}
-          </div>
-        </div>
-      </draggable>
     </div>
     <div style="width: 70%; float: right;">
       <h3>Form</h3>
@@ -58,11 +51,11 @@
             <label for="email">Email:</label>
             <input type="text" id="email" name="email" class="checkout" Placeholder="user@email.com">
           </div>
-          <div v-if="element.name === 'name'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
+          <div v-else-if="element.name === 'name'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" class="checkout" Placeholder="First and Last Name">
           </div>
-          <div v-if="element.name === 'address'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
+          <div v-else-if="element.name === 'address'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
             <label for="address1">Address:</label>
             <input type="text" id="address1" name="address1" class="checkout" placeholder="Street Address">
             <label for="address2">Address 2:</label>
@@ -76,11 +69,9 @@
             <label for="zip">Postal Code:</label>
             <input type="text" id="zip" name="zip" class="checkout" placeholder="Local Postal Code">
           </div>
-          <div v-if="element.name === 'custom'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            <div v-for="(item) in element.items" :key="item.customname">
-              <label :for="item.customname">{{ item.customformlabel }}:</label>
-              <input type="text" :id="item.customname" :name="item.customname" class="customcheckout" :placeholder="item.customplaceholder" :required="item.customrequired"><br>
-            </div>
+          <div v-else class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
+            <label :for="element.name">{{ element.label }}:</label>
+            <input type="text" :id="element.name" :name="element.name" class="checkout" :placeholder="element.placeholder" :required="element.required"><br>
           </div>
         </div>
       </draggable>
@@ -117,9 +108,6 @@ export default {
         { name: "address" }
       ],
       form: [
-      ],
-      custom: [
-        { name: "custom", items: [] }
       ],
       customname: '',
       customformlabel: '',
@@ -158,19 +146,12 @@ export default {
       this.googletoken = ''
     },
     addCustom() {
-      this.custom[0].items.push({
-        customname: this.customname,
-        customformlabel: this.customformlabel,
-        customplaceholder: this.customplaceholder,
-        customrequired: this.customrequired
+      this.available.push({
+        name: this.customname,
+        label: this.customformlabel,
+        placeholder: this.customplaceholder,
+        required: this.customrequired
       })
-      this.customname = ''
-      this.customformlabel = ''
-      this.customplaceholder = ''
-      this.customrequired = false
-    },
-    resetCustom() {
-      this.custom[0].items = []
       this.customname = ''
       this.customformlabel = ''
       this.customplaceholder = ''
@@ -196,22 +177,13 @@ export default {
       for (let input of this.form) {
         if (input.name == 'email') {
           formobj.inputs.push({type:"email",placeholder:"user@email.com",required:true})
-        }
-        if (input.name == 'name') {
+        } else if (input.name == 'name') {
           formobj.inputs.push({type:"name",placeholder:"First and Last Name",required:true})
-        }
-        if (input.name == 'address') {
+        } else if (input.name == 'address') {
           formobj.inputs.push({type:"address",required:true})
-        }
-        if (input.name == 'custom' && input.items.length > 0) {
-          for (let custominput of input.items) {
-            let customform = {}
-            customform['name'] = custominput.customname
-            customform['label'] = custominput.customformlabel
-            customform['placeholder'] = custominput.customplaceholder
-            customform['required'] = custominput.customrequired
-            custom.push(customform)
-          }
+        } else {
+          input['type'] = 'custom'
+          formobj.inputs.push(input)
         }
       }
       if (custom.length > 0) {
