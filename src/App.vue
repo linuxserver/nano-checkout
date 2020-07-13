@@ -18,7 +18,7 @@
   <div v-show="logged !== true" class="pageinfo" >
     <p>Nano Checkout is a non custodial checkout system designed to securely send your customer&#39;s order information to you in a cryptographically verifiable manner. Instead of using &quot;middle men&quot; or custodial wallets outside of your control we leverage <a href="https://www.nanometadata.com/" target="_blank">https://www.nanometadata.com/</a> and act as a message broker with supported Nano wallets. The customer sends funds directly to your wallet, hashes and signs the order information data payload using private/pubkey verification, and sends the payload to us to verify and send to you.<br><br>You will receive orders as an email with all the order information along with links to the verifiable metadata and Nano transaction information. Gmail is specifically used for this service due to their secure oauth system and incredibly powerful <a href="https://developers.google.com/gmail/api" target="_blank">API</a> allowing orders to be programatically ingested if needed. (examples <a href="https://github.com/linuxserver/docker-gmail-order-bot" target="_blank">here</a> )<br><br>To get started simply login with Gmail above and build your first order form, the resulting QR code and form URL can be used in the following Nano wallets:<br><ul><li>LSIO Nano Wallet - <a href="https://wallet.linuxserver.io" target="_blank">https://wallet.linuxserver.io</a></li></ul>This form&#39;s URL and QR code can be embedded in static sites and shared in any manner you see fit. Your customer sends you Nano and you get an email with the information you requested, it really is that simple.<br><br></p>
   </div>
-  <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true class="signout" >Sign Out</GoogleLogin>
+  <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true class="signout" >{{ email }} <span class="icon"><i class="fa fa-sign-out"></i></span></GoogleLogin>
   <div v-show="logged === true" class="container" id="generatecheckout">
     <div class="required">
       <h3>Transaction Values (Required)</h3>
@@ -104,7 +104,7 @@
       </div>
     </div>
     <hr />
-    <button v-show="logged === true" @click="sendForm" class="upload">Upload Form</button>
+    <button v-show="logged === true" @click="sendForm" class="upload">Upload Form<span v-show="loading === true" class="icon"><i class="fa fa-spinner"></i></span></button>
   </div>
 </div>
 </template>
@@ -151,7 +151,8 @@ export default {
       price: '',
       net: 'live',
       productid: '',
-      output: null
+      output: null,
+      email: ''
     }
   },
   components: {
@@ -161,11 +162,15 @@ export default {
   },
   methods: {
     onSuccess(googleUser) {
+      const profile = googleUser.getBasicProfile();
+      this.email = profile.getEmail();
       const token = googleUser.getAuthResponse().id_token
       this.logged = true
       this.googletoken = token
     },
     onCurrentUser(googleUser) {
+      const profile = googleUser.getBasicProfile();
+      this.email = profile.getEmail();
       const token = googleUser.getAuthResponse().id_token
       this.logged = true
       this.googletoken = token
@@ -174,6 +179,7 @@ export default {
       console.log('User signed out.')
       this.logged = false
       this.googletoken = ''
+      this.email = ''
     },
     addCustom() {
       this.available.push({
@@ -197,6 +203,7 @@ export default {
         })
         return false
       }
+      this.loading = true
       let formobj = {}
       formobj['product'] = this.productname
       formobj['productid'] = this.productid
@@ -221,7 +228,6 @@ export default {
         }
       }
       const formyaml = YAML.stringify(formobj)
-      console.log(formyaml)
       let Init = { method:'POST',body: formyaml}
       let url = this.apiurl + '?type=upload&token=' + this.googletoken
       const res = await fetch(url,Init)
@@ -229,6 +235,7 @@ export default {
       if (data.action === 'success') {
         this.output = 'https://www.nanocheckout.com/templates/' + data.message
         this.$modal.show('finished')
+        this.loading = false
         return true
       } else {
         this.$notify({
@@ -236,6 +243,7 @@ export default {
           text: data.message,
           type: 'error'
         })
+        this.loading = false
         return false
       }
     },
