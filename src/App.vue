@@ -195,7 +195,6 @@ export default {
       formobj['destination'] = this.destination
       formobj['net'] = this.net
       formobj['inputs'] = []
-      let custom = []
       for (let input of this.form) {
         if (input.name == 'email') {
           formobj.inputs.push({type:"email",placeholder:"user@email.com",required:true})
@@ -207,9 +206,6 @@ export default {
           input['type'] = 'custom'
           formobj.inputs.push(input)
         }
-      }
-      if (custom.length > 0) {
-        formobj.inputs.push({custom: custom})
       }
       const formyaml = YAML.stringify(formobj)
       console.log(formyaml)
