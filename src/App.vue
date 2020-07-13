@@ -159,9 +159,6 @@ export default {
     draggable,
     VueQrcode
   },
-  props: {
-    formurl: String
-  },
   methods: {
     onSuccess(googleUser) {
       const token = googleUser.getAuthResponse().id_token
