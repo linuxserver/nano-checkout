@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 Vue.use(Notifications)
 import vueCountryRegionSelect from 'vue-country-region-select'
 Vue.use(vueCountryRegionSelect)
+import vmodal from 'vue-js-modal'
+Vue.use(vmodal)
 
 library.add(faClone,faSpinner)
 

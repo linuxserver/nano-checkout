@@ -1,9 +1,18 @@
 <template>
 <div id="app">
+  <modal :width=300 :height=480 :adaptive="true" :clickToClose="false" name="finished">
+    <div class="modalcontent">
+      <div class="heading">
+        Form Uploaded
+      </div>
+      <vue-qrcode :width=260 :value="output" />
+      <div class="formelements"><a :href="output" target="_blank">{{ output }}</a></div>
+      <div class="pad"><button @click="closeoutput" class="close">Close</button></div>
+    </div>
+  </modal>
   <notifications position="top center"/>
   <div class="heading">
     <h4>If this is your first checkout upload you will need to confirm your Email address with AWS before receiving orders</h4>
-    <div v-show="logged === true">{{ output }}</div>
   </div>
   <GoogleLogin v-show="logged !== true" :params="gparams" class="googlelogin" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
   <div v-show="logged !== true" class="pageinfo" >
@@ -32,7 +41,7 @@
       <div class="items">
         <h3>Available Elements</h3>
         <p>Drag from "Available Elements" onto the "Form Preview". Min one custom or preset element.</p>
-        <draggable :list="available" group="formelements">
+        <draggable :list="available" group="formelements" class="formelements">
           <div v-for="(element) in available" :key="element.name" >
             <div class="dragbox boxshadow">
               <div class="line">
@@ -58,7 +67,7 @@
         </div>
       </div>
       <div class="form">
-        <h3>Form Preview</h3>
+        <h3>Form Preview (What the client sees)</h3>
         <div class="preview">
         <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }} ,please save your receipt from this order it will help you verify your order if something goes wrong</h4>
         <draggable :list="form" group="formelements" style="min-height: 300px;">
@@ -96,7 +105,6 @@
     </div>
     <hr />
     <button v-show="logged === true" @click="sendForm" class="upload">Upload Form</button>
-
   </div>
 </div>
 </template>
@@ -106,6 +114,7 @@ import * as NanoCurrency from 'nanocurrency'
 import GoogleLogin from 'vue-google-login'
 import draggable from 'vuedraggable'
 import YAML from 'yaml'
+import VueQrcode from 'vue-qrcode'
 
 export default {
   name: 'App',
@@ -142,12 +151,16 @@ export default {
       price: '',
       net: 'live',
       productid: '',
-      output: ''
+      output: null
     }
   },
   components: {
     GoogleLogin,
-    draggable
+    draggable,
+    VueQrcode
+  },
+  props: {
+    formurl: String
   },
   methods: {
     onSuccess(googleUser) {
@@ -159,7 +172,6 @@ export default {
       const token = googleUser.getAuthResponse().id_token
       this.logged = true
       this.googletoken = token
-      console.log(token)
     },
     signOut() {
       console.log('User signed out.')
@@ -191,7 +203,11 @@ export default {
       let formobj = {}
       formobj['product'] = this.productname
       formobj['productid'] = this.productid
-      formobj['price'] = this.price
+      if (this.price.startsWith('.')){
+        formobj['price'] = '0' + this.price
+      } else {
+        formobj['price'] = this.price
+      }
       formobj['destination'] = this.destination
       formobj['net'] = this.net
       formobj['inputs'] = []
@@ -213,7 +229,21 @@ export default {
       let url = this.apiurl + '?type=upload&token=' + this.googletoken
       const res = await fetch(url,Init)
       const data = await res.json()
-      this.output = 'upload: ' + JSON.stringify(data)
+      if (data.action === 'success') {
+        this.output = 'https://www.nanocheckout.com/templates/' + data.message
+        this.$modal.show('finished')
+        return true
+      } else {
+        this.$notify({
+          title: 'Error',
+          text: data.message,
+          type: 'error'
+        })
+        return false
+      }
+    },
+    closeoutput() {
+      this.$modal.hide('finished')
     }
   }
 }
@@ -371,13 +401,22 @@ hr {
   border: none;
   margin-bottom: 40px;
 }
+.close {
+  width: 50%;
+  padding: 10px;
+  background: #35444a;
+  color: white;
+  border-radius: 6px;
+  font-size: 18px;
+  border: none;
+}
 input[type=text], select {
   display: inline-block;
   padding: 10px 13px;
   border: 1px solid #ccc;
   width: calc(100% - 150px);
   &::placeholder {
-    color: #dedede;
+    color: #1c1c1c;
   }
 }
 .required {
@@ -466,5 +505,19 @@ label {
   display: inline-block;
   width:150px;
   text-align: left;
+}
+.formelements {
+  min-height: 100px;
+  border: 1px solid #d4d4d4;
+  padding: 12px 5px 0px;
+  box-shadow: 0 0 10px #7d7d7d1f;
+  background: #fbfbfb;
+}
+.modalcontent {
+  align-items: center;
+  text-align: center;
+}
+.pad {
+  padding: 10px;
 }
 </style>
