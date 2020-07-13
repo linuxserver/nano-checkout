@@ -259,6 +259,7 @@ html, body {
   box-shadow: 0 0 10px #7d7d7d1f;
   background: #fbfbfb;
   margin-top: 15px;
+  word-break: break-word;
 }
 .form-elements {
   display: flex;
