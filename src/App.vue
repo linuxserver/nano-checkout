@@ -5,77 +5,95 @@
     <h4>If this is your first checkout upload you will need to confirm your Email address with AWS before receiving orders</h4>
     <div v-show="logged === true">{{ output }}</div>
   </div>
-  <button v-show="logged === true" @click="sendForm" style="position:absolute; top:0; left:0;">Upload Form</button>
-  <GoogleLogin v-show="logged !== true" :params="gparams" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
-  <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true style="position:absolute; top:0; right:0;" >Sign Out</GoogleLogin>
-  <div v-show="logged === true" id="generatecheckout">
-    <div style="width: 20%; float: left;">
+  <GoogleLogin v-show="logged !== true" :params="gparams" class="googlelogin" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
+  <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true class="signout" >Sign Out</GoogleLogin>
+  <div v-show="logged === true" class="container" id="generatecheckout">
+    <div class="required">
       <h3>Transaction Values (Required)</h3>
       <label for="productname">Product Name:</label>
-      <input type="text" v-model="productname" id="productname" name="productname" class="corevalues" Placeholder="My Product"><br>
+      <input type="text" v-model="productname" id="productname" name="productname" class="corevalues" Placeholder="My Product">
       <label for="productid">Product ID:</label>
-      <input type="text" v-model="productid" id="productid" name="productid" class="corevalues" Placeholder="173648092"><br>
+      <input type="text" v-model="productid" id="productid" name="productid" class="corevalues" Placeholder="173648092">
       <label for="price">Price:</label>
-      <input type="text" v-model="price" id="price" name="price" class="corevalues" Placeholder="10.74"><br>
+      <input type="text" v-model="price" id="price" name="price" class="corevalues" Placeholder="10.74">
       <label for="destination">Destination:</label>
-      <input type="text" v-model="destination" id="destination" name="destination" class="corevalues" Placeholder="nano_xxxxxx"><br>
+      <input type="text" v-model="destination" id="destination" name="destination" class="corevalues" Placeholder="nano_xxxxxx">
       <label for="net" >Network:</label>
       <select name="net" id="net" class="corevalues" v-model="net">
         <option>live</option>
         <option>lsio</option>
       </select>
-      <h3>Available (*min one custom or preset)</h3>
-      <draggable :list="available" group="formelements" style="min-height: 150px;">
-        <div v-for="(element) in available" :key="element.name" >
-          <div class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            {{ element.name }}
+    </div>
+    <hr />
+    <div class="form-elements">
+      <div class="items">
+        <h3>Available Elements</h3>
+        <p>Drag from "Available Elements" onto the "Form Preview". Min one custom or preset element.</p>
+        <draggable :list="available" group="formelements">
+          <div v-for="(element) in available" :key="element.name" >
+            <div class="dragbox boxshadow">
+              <div class="line">
+              <i class="fas fa-grip-vertical"></i> {{ element.name }}
+              </div>
+            </div>
+          </div>
+        </draggable>
+        <button class="customelement" @click="custom=true"><div class="icon"><i class="fas fa-plus"></i></div> Add custom element</button>
+        <div v-show="custom===true" class="custom">
+          <label for="customname">Name:</label>
+          <input type="text" v-model="customname" id="customname" name="customname">
+          <label for="customformlabel">Form Label:</label>
+          <input type="text" v-model="customformlabel" id="customformlabel" name="customformlabel">
+          <label for="customplaceholder">Placeholder:</label>
+          <input type="text" v-model="customplaceholder" id="customplaceholder" name="customplaceholder">
+          <label for="customrequired"> Required</label>
+          <input type="checkbox" v-model="customrequired" id="customrequired" name="customrequired">
+          <hr />
+          <div class="buttonlist">
+            <button @click="addCustom">Save</button><a href="#" @click.prevent="custom=false">Cancel</a>
           </div>
         </div>
-      </draggable>
-      <h3>Custom Elements <button @click="addCustom">Add Custom</button></h3>
-      <label for="customname">Name:</label>
-      <input type="text" v-model="customname" id="customname" name="customname"><br>
-      <label for="customformlabel">Form Label:</label>
-      <input type="text" v-model="customformlabel" id="customformlabel" name="customformlabel"><br>
-      <label for="customplaceholder">Placeholder:</label>
-      <input type="text" v-model="customplaceholder" id="customplaceholder" name="customplaceholder"><br>
-      <label for="customrequired"> Required</label>
-      <input type="checkbox" v-model="customrequired" id="customrequired" name="customrequired"><br>
-    </div>
-    <div style="width: 70%; float: right;">
-      <h3>Form</h3>
-      <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }} ,please save your receipt from this order it will help you verify your order if something goes wrong</h4>
-      <draggable :list="form" group="formelements" style="min-height: 300px;">
-        <div v-for="(element) in form" :key="element.name">
-          <div v-if="element.name === 'email'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            <label for="email">Email:</label>
-            <input type="text" id="email" name="email" class="checkout" Placeholder="user@email.com">
+      </div>
+      <div class="form">
+        <h3>Form Preview</h3>
+        <div class="preview">
+        <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }} ,please save your receipt from this order it will help you verify your order if something goes wrong</h4>
+        <draggable :list="form" group="formelements" style="min-height: 300px;">
+          <div v-for="(element) in form" :key="element.name">
+            <div v-if="element.name === 'email'" class="dragbox boxshadow">
+              <label for="email">Email:</label>
+              <input type="text" id="email" name="email" class="checkout" Placeholder="user@email.com">
+            </div>
+            <div v-else-if="element.name === 'name'" class="dragbox boxshadow">
+              <label for="name">Name:</label>
+              <input type="text" id="name" name="name" class="checkout" Placeholder="First and Last Name">
+            </div>
+            <div v-else-if="element.name === 'address'" class="dragbox boxshadow">
+              <label for="address1">Address:</label>
+              <input type="text" id="address1" name="address1" class="checkout" placeholder="Street Address">
+              <label for="address2">Address 2:</label>
+              <input type="text" id="address2" name="address2" class="checkout" placeholder="Apt or Box #">
+              <label for="country">Country:</label>
+              <country-select v-model="country" id="country" name="country" :country="country" topCountry="US" class="checkout"/>
+              <label for="region">Region:</label>
+              <region-select v-model="region" id="region" name="region" :country="country" :region="region" class="checkout"/>
+              <label for="city">City:</label>
+              <input type="text" id="city" name="city" class="checkout" placeholder="Local City">
+              <label for="zip">Postal Code:</label>
+              <input type="text" id="zip" name="zip" class="checkout" placeholder="Local Postal Code">
+            </div>
+            <div v-else class="dragbox boxshadow">
+              <label :for="element.name">{{ element.label }}:</label>
+              <input type="text" :id="element.name" :name="element.name" class="checkout" :placeholder="element.placeholder" :required="element.required">
+            </div>
           </div>
-          <div v-else-if="element.name === 'name'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" class="checkout" Placeholder="First and Last Name">
-          </div>
-          <div v-else-if="element.name === 'address'" class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            <label for="address1">Address:</label>
-            <input type="text" id="address1" name="address1" class="checkout" placeholder="Street Address">
-            <label for="address2">Address 2:</label>
-            <input type="text" id="address2" name="address2" class="checkout" placeholder="Apt or Box #">
-            <label for="country">Country:</label>
-            <country-select v-model="country" id="country" name="country" :country="country" topCountry="US" class="checkout"/>
-            <label for="region">Region:</label>
-            <region-select v-model="region" id="region" name="region" :country="country" :region="region" class="checkout"/>
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" class="checkout" placeholder="Local City">
-            <label for="zip">Postal Code:</label>
-            <input type="text" id="zip" name="zip" class="checkout" placeholder="Local Postal Code">
-          </div>
-          <div v-else class="roundbox boxshadow" style="width: 100%; border: solid 2px steelblue">
-            <label :for="element.name">{{ element.label }}:</label>
-            <input type="text" :id="element.name" :name="element.name" class="checkout" :placeholder="element.placeholder" :required="element.required"><br>
-          </div>
+        </draggable>
         </div>
-      </draggable>
+      </div>
     </div>
+    <hr />
+    <button v-show="logged === true" @click="sendForm" class="upload">Upload Form</button>
+
   </div>
 </div>
 </template>
@@ -109,6 +127,7 @@ export default {
       ],
       form: [
       ],
+      custom: false,
       customname: '',
       customformlabel: '',
       customplaceholder: '',
@@ -156,6 +175,7 @@ export default {
       this.customformlabel = ''
       this.customplaceholder = ''
       this.customrequired = false
+      this.custom = false
     },
     async sendForm () {
       if (! this.productname || ! this.productid || ! this.price || ! NanoCurrency.checkAddress(this.destination) || this.form.length == 0) {
@@ -204,7 +224,7 @@ export default {
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;700&display=swap');
 // Body
-$body-bg1: #4d5879;
+$body-bg1: #f3f3f3;
 $body-bg2: #26314e;
 // Typography
 $font-family-sans-serif: "Nunito", sans-serif;
@@ -212,30 +232,175 @@ $font-size-base: 16px;
 $line-height-base: 1.6;
 // Colors
 $active: #0075c2;
-$text: #a7b0ca;
+$text: #495c5f;
 $lighter-text: #959da0;
 $highlight: #59c7f1;
 $highlightsemi: #59c7f1bb;
 $highlight2: #af73d2;
 $highlight3: #e2ac39;
 html, body {
-    background: linear-gradient(to bottom, $body-bg1, $body-bg2);
+    background: $body-bg1;
     color: $text;
     font-family: 'Nunito', sans-serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: $font-size-base;
     height: 100%;
     margin: 0;
 }
+* {
+  box-sizing: border-box;
+}
 .highlight {
     color: $highlight;
 }
+.preview {
+  border: 1px solid #d4d4d4;
+  padding: 10px 20px;
+  box-shadow: 0 0 10px #7d7d7d1f;
+  background: #fbfbfb;
+  margin-top: 15px;
+}
+.form-elements {
+  display: flex;
+  @media all and (max-width: 800px) {
+    flex-direction: column;
+  }
+  .items {
+    flex: 0 0 240px;
+    margin-right: 40px;
+    @media all and (max-width: 800px) {
+      margin-right: 0;
+      margin-bottom: 40px;
+    }
+  }
+  h3 {
+    margin: 0px;
+  }
+  p {
+    margin: 0 0 15px;
+    font-size: 12px;
+  }
+}
+.signout {
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  background: darken($highlight, 20%);
+  border: none;
+  color: #95e2ff;
+  padding: 5px 14px;
+  cursor: pointer;
+  @media all and (max-width: 1020px) {
+    float: right;
+    position: unset;
+    padding: 10px 15px;
+  }
+}
+.customelement {
+  margin: 5px 0;
+  background: #fbfbfb;
+  border: 1px solid #c5c5c5;
+  width: 100%;
+  padding: 14px;
+  padding-left: 70px;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  font-weight: 700;
+  color: $text;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  .icon {
+    background: #ffffff;
+    padding: 14px 18px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-right: 1px solid #c5c5c5;
+  }
+}
+
+.custom {
+  background: #fbfbfb;
+  border: 1px solid #ccc;
+  padding: 20px;
+  input[type="text"] {
+    width: 100%;
+  }
+}
+.buttonlist {
+  display: flex;
+  align-items: center;
+  button {
+    flex: 1;
+    padding: 10px;
+  }
+  a {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    color: $text;
+  }
+}
+
+hr {
+  height: 0;
+  border-style: none;
+  border-top:1px solid #fff;
+  margin: 40px 5px;
+  position: relative;
+  overflow: visible;
+  &:after {
+    content: "";
+    border-bottom: 1px solid #dedede;
+    position: absolute;
+    top:-2px;
+    width: 100%;
+    left: 0;
+  }
+}
+.upload {
+  padding: 20px;
+  width: 100%;
+  background: #35444a;
+  color: white;
+  border-radius: 6px;
+  font-size: 18px;
+  text-transform: uppercase;
+  border: none;
+  margin-bottom: 40px;
+}
+input[type=text], select {
+  display: inline-block;
+  padding: 10px 13px;
+  border: 1px solid #ccc;
+  width: calc(100% - 150px);
+  &::placeholder {
+    color: #dedede;
+  }
+}
+.required {
+  input[type=text], select {
+    width: calc(100% - 150px);
+  }
+}
 .container {
-  padding: 10px 10px 10px 10px;
-  max-width: 800px;
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 .heading {
   text-align: center;
+  background: $highlight;
+  padding: 10px;
+  color: white;
+  h4 {
+    margin: 0;
+    font-weight: 400;
+    text-shadow: 0 0 5px #14455859;
+  }
 }
 @keyframes spinner {
   to { transform: rotate(360deg); }
@@ -243,23 +408,59 @@ html, body {
 .fa-spinner {
   animation: spinner 1s linear infinite;
 }
+.googlelogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 42px);
+}
 .boxshadow 
 {
-  padding: 10px;
-  -moz-box-shadow: 3px 3px 5px #535353;
-  -webkit-box-shadow: 3px 3px 5px #535353;       
-  box-shadow: 3px 3px 5px #535353;
+  padding: 10px 15px 10px 21px;
 }
-.roundbox
+.dragbox
 {  
-  -moz-border-radius: 6px 6px 6px 6px;
-  -webkit-border-radius: 6px;  
-  border-radius: 6px 6px 6px 6px;
+  margin: 0 0 10px;
+  border: 1px solid #c5c5c5;
+  display: flex;
+  cursor: grab;
+  font-weight: 700;
+  position: relative;
+  flex-direction: column;
+  .line {
+    display: flex;
+    align-items: center;
+  }
+  label {
+    padding-top: 0;
+    padding-bottom: 8px;
+    font-size: 14px;
+    padding-left: 2px;
+  }
+  input[type=text], select {
+    width: 100%;
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 5px;
+    }
+  }
+  &:before {
+    position: absolute;
+    content: "";
+    top:0;
+    left:0;
+    bottom: 0;
+    width: 6px;
+    background: $highlight;
+  }
+  svg {
+    margin-right: 20px;
+  }
 }
 label {
-  padding: 8px;
+  padding: 12px 0;
   display: inline-block;
-  width:120px;
+  width:150px;
   text-align: left;
 }
 </style>
