@@ -78,7 +78,7 @@
       <div class="form">
         <h3>Form Preview (What the client sees)</h3>
         <div class="preview">
-        <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }} ,please save your receipt from this order it will help you verify your order if something goes wrong</h4>
+        <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }}, please save your receipt from this order it will help you verify your order if something goes wrong</h4>
         <draggable :list="form" group="formelements" style="min-height: 300px;">
           <div v-for="(element) in form" :key="element.name">
             <div v-if="element.name === 'email'" class="dragbox boxshadow">
