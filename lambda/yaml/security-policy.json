@@ -1,0 +1,27 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1593620877697",
+            "Action": [
+                "ses:VerifyEmailIdentity",
+                "ses:GetIdentityVerificationAttributes"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Stmt1592682110391",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::nanocheckout.com/templates/*",
+                "arn:aws:s3:::nanocheckout-federation/*"
+            ]
+        }
+    ]
+}
