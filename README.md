@@ -14,6 +14,7 @@ If you want to host this yourself you need to have a basic underlying understand
 * AWS S3 - Backend data storage behind Coudfront
 * AWS API Gateway - Used to provide an https endpoint the server side component can be invoked with in a scaling horizontal manner
 * AWS Lambda - The actual invocation of the code to authenticate form owners and verify order payloads against blockchain information and metadata
+* AWS SES - For sending out order emails
 
 ## Authentication and Yaml hosting
 
