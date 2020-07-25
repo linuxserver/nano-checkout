@@ -42,6 +42,7 @@
       <label for="net" >Network:</label>
       <select name="net" id="net" class="corevalues" v-model="net">
         <option>live</option>
+        <option>banano</option>
         <option>lsio</option>
       </select>
     </div>
