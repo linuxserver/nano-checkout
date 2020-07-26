@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import * as NanoCurrency from 'nanocurrency'
+import * as NanoCurrency from '@thelamer/nanocurrency'
 import GoogleLogin from 'vue-google-login'
 import draggable from 'vuedraggable'
 import YAML from 'yaml'
