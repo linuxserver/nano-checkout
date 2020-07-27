@@ -34,11 +34,11 @@
       <label for="productname">Product Name:</label>
       <input type="text" v-model="productname" id="productname" name="productname" class="corevalues" Placeholder="My Product">
       <label for="productid">Product ID:</label>
-      <input type="text" v-model="productid" id="productid" name="productid" class="corevalues" Placeholder="173648092">
+      <input type="text" v-model="productid" id="productid" name="productid" class="corevalues" Placeholder="IE 173648092">
       <label for="price">Price:</label>
       <input type="text" v-model="price" id="price" name="price" class="corevalues" Placeholder="10.74">
       <label for="destination">Destination:</label>
-      <input type="text" v-model="destination" id="destination" name="destination" class="corevalues" Placeholder="nano_xxxxxx">
+      <input type="text" v-model="destination" id="destination" name="destination" class="corevalues" Placeholder="nano_xxx or ban_xxx">
       <label for="net" >Network:</label>
       <select name="net" id="net" class="corevalues" v-model="net">
         <option>live</option>
@@ -79,7 +79,7 @@
       <div class="form">
         <h3>Form Preview (What the client sees)</h3>
         <div class="preview">
-        <h4>This will send {{ price }} Nano to {{ destination }} for {{ productname }}, please save your receipt from this order it will help you verify your order if something goes wrong</h4>
+        <h4>This will send {{ price }} {{ displayname }} to {{ destination }} for {{ productname }}, please save your receipt from this order it will help you verify your order if something goes wrong</h4>
         <draggable :list="form" group="formelements" style="min-height: 300px;">
           <div v-for="(element) in form" :key="element.name">
             <div v-if="element.name === 'email'" class="dragbox boxshadow">
@@ -165,13 +165,23 @@ export default {
       output: null,
       email: '',
       deletebutton: false,
-      templateid: ''
+      templateid: '',
+      displayname: 'Nano'
     }
   },
   components: {
     GoogleLogin,
     draggable,
     VueQrcode
+  },
+  watch: {
+    net: function () {
+      if (this.net == 'banano') {
+        this.displayname = 'Banano'
+      } else {
+        this.displayname = 'Nano'
+      }
+    }
   },
   mounted () {
     if (window.location.hash.startsWith('#/delete/')) {
