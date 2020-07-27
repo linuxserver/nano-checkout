@@ -1,6 +1,12 @@
 <template>
 <div id="app">
   <notifications position="top center"/>
+  <div v-show="emailgood === true">
+  <h1><center>Email Verified, Thanks!</center></h1>
+  </div>
+  <div v-show="emailbad === true">
+  <h1><center>Email Verification Failed!</center></h1>
+  </div>
   <div v-show="deletebutton === true">
   <GoogleLogin v-show="logged === true" :params="gparams" :onSuccess="signOut" :logoutButton=true class="signout" >{{ email }} <span class="icon"><i class="fa fa-sign-out"></i></span></GoogleLogin>
   <GoogleLogin v-show="logged !== true" :params="gparams" class="googlelogin" :renderParams="grenderParams" :onSuccess="onSuccess" :onCurrentUser="onCurrentUser"></GoogleLogin>
@@ -9,7 +15,7 @@
     <button v-show="logged === true" @click="deleteForm" class="upload">Delete {{ templateid }}<span v-show="loading === true" class="icon"><i class="fa fa-spinner"></i></span></button>
   </div>
   </div>
-  <div v-show="deletebutton !== true">
+  <div v-show="deletebutton !== true && emailgood !== true && emailbad !== true">
   <modal :width=300 :height=480 :adaptive="true" :clickToClose="false" name="finished">
     <div class="modalcontent">
       <div class="heading">
@@ -166,7 +172,9 @@ export default {
       email: '',
       deletebutton: false,
       templateid: '',
-      displayname: 'Nano'
+      displayname: 'Nano',
+      emailgood: false,
+      emailbad: false
     }
   },
   components: {
@@ -187,6 +195,12 @@ export default {
     if (window.location.hash.startsWith('#/delete/')) {
       this.deletebutton = true
       this.templateid = window.location.hash.replace('#/delete/','')
+    }
+    if (window.location.hash.startsWith('#/email-verified')) {
+      this.emailgood = true
+    }
+    if (window.location.hash.startsWith('#/email-failed')) {
+      this.emailbad = true
     }
   },
   methods: {
